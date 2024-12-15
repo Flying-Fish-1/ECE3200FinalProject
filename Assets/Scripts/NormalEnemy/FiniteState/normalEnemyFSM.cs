@@ -57,10 +57,10 @@ public class normalEnemyFSM : MonoBehaviour
     {
         currentState.OnUpdate();
 
-        if (false)
-        {
-            parameter.getHit = true;
-        }
+        //if ())
+        //{
+        //    parameter.getHit = true;
+        //}
     }
 
     public void TransitionState(normalEnemyStateType type)

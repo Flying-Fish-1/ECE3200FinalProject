@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -11,6 +12,11 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Collider2D _bodyColl;
 
     private Rigidbody2D _rb;
+    private Animator _animator;
+
+    // Animation variables
+    private bool IsMoving;
+    private bool IsJumping;
 
     // Movement variables
     private Vector2 _moveVelocity;
@@ -48,12 +54,21 @@ public class PlayerMovement : MonoBehaviour
         _isFacingRight = true;
 
         _rb = GetComponent<Rigidbody2D>();
+        _animator = GetComponent<Animator>();
     }
 
     private void Update()
     {
         CountTimers();
         JumpChecks(); // Called in Update since need to check the jump input every frame
+
+        UpdateAnimations();
+    }
+
+    private void UpdateAnimations()
+    {
+        _animator.SetBool("IsJumping", IsJumping);
+        _animator.SetBool("IsRunning", IsMoving);
     }
 
     private void FixedUpdate()
@@ -95,10 +110,12 @@ public class PlayerMovement : MonoBehaviour
             Vector2 targetVelocity = Vector2.zero;
             if (InputManager.RunIsHeld)
             {
+                IsMoving = true;
                 targetVelocity = new Vector2(moveInput.x, 0f) * MoveStats.MaxRunSpeed;
             }
             else
             {
+                IsMoving = true;
                 targetVelocity = new Vector2(moveInput.x, 0f) * MoveStats.MaxWalkSpeed;
             }
 
@@ -108,6 +125,7 @@ public class PlayerMovement : MonoBehaviour
 
         else if (moveInput == Vector2.zero)
         {
+            IsMoving = false;
             _moveVelocity = Vector2.Lerp(_moveVelocity, Vector2.zero, deceleration * Time.fixedDeltaTime);
             _rb.velocity = new Vector2(_moveVelocity.x, _rb.velocity.y);
         }
@@ -232,6 +250,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void Jump()
     {
+        IsJumping = _isJumping; // For animation purposes
+
         // APPLY GRAVITY WHILE JUMPING
         if (_isJumping)
         {
