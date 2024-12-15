@@ -931,7 +931,7 @@ Transform:
   m_GameObject: {fileID: 778021150}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.58, y: -3.89, z: 0}
+  m_LocalPosition: {x: 5.58, y: -3.89, z: 5}
   m_LocalScale: {x: 3, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1015,7 +1015,7 @@ Transform:
   m_GameObject: {fileID: 1194386850}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.98, y: -1.16, z: 0}
+  m_LocalPosition: {x: -7.98, y: -1.16, z: 5}
   m_LocalScale: {x: 3, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1372,7 +1372,7 @@ Transform:
   m_GameObject: {fileID: 1421467300}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.71, y: 6.98, z: 0}
+  m_LocalPosition: {x: -1.71, y: 6.98, z: 5}
   m_LocalScale: {x: 3, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1388,6 +1388,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1430487574}
   - component: {fileID: 1430487573}
+  - component: {fileID: 1430487575}
   m_Layer: 0
   m_Name: Virtual Camera
   m_TagString: Untagged
@@ -1450,6 +1451,35 @@ Transform:
   - {fileID: 502140500}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1430487575
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1430487572}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed0a30204fb9342a78574f217791d419, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parallaxLayers:
+  - layerTransform: {fileID: 1194386852}
+    parallaxFactor: 0.6
+  - layerTransform: {fileID: 2065804528}
+    parallaxFactor: 0.6
+  - layerTransform: {fileID: 1215539986}
+    parallaxFactor: 0.6
+  - layerTransform: {fileID: 1855095246}
+    parallaxFactor: 0.6
+  - layerTransform: {fileID: 1421467302}
+    parallaxFactor: 0.6
+  - layerTransform: {fileID: 739998935}
+    parallaxFactor: 0.6
+  - layerTransform: {fileID: 590607301}
+    parallaxFactor: 0.9
+  - layerTransform: {fileID: 778021152}
+    parallaxFactor: 0.6
 --- !u!1 &1576056843 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5850833196443443781, guid: 6e4823fda158d4a3d9c308cc9d114e8c, type: 3}
@@ -1837,7 +1867,7 @@ Transform:
   m_GameObject: {fileID: 2065804526}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.07, y: -0.84, z: 0}
+  m_LocalPosition: {x: -4.07, y: -0.84, z: 5}
   m_LocalScale: {x: -2.45, y: 2.55, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
