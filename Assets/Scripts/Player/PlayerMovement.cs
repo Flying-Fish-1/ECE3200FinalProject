@@ -1,9 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : MonoBehaviour, IDamageable
 {
     [Header("References")]
     public PlayerMovementStats MoveStats;
@@ -11,6 +12,22 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Collider2D _bodyColl;
 
     private Rigidbody2D _rb;
+    private Animator _animator;
+    public Attack attack;
+    public HeavyAttack heavyAttack;
+    public SpriteRenderer spriteRenderer;
+    public Rigidbody2D rb;
+    public int health = 100;
+    private bool isDamageable = true;
+
+    // Animation variables
+    private bool IsMoving;
+    private bool IsJumping;
+    private bool IsLightAttacking;
+    private bool IsHeavyAttacking;
+    private bool IsHit;
+    private bool IsDead;
+    private static bool isMoveable = true;
 
     // Movement variables
     private Vector2 _moveVelocity;
@@ -48,12 +65,25 @@ public class PlayerMovement : MonoBehaviour
         _isFacingRight = true;
 
         _rb = GetComponent<Rigidbody2D>();
+        _animator = GetComponent<Animator>();
     }
 
     private void Update()
     {
         CountTimers();
-        JumpChecks(); // Called in Update since need to check the jump input every frame
+        if (isMoveable) JumpChecks(); // Called in Update since need to check the jump input every frame
+
+        UpdateAnimations();
+    }
+
+    private void UpdateAnimations()
+    {
+        _animator.SetBool("IsJumping", IsJumping);
+        _animator.SetBool("IsRunning", IsMoving);
+        _animator.SetBool("IsLightAttacking", IsLightAttacking);
+        _animator.SetBool("IsHeavyAttacking", IsHeavyAttacking);
+        _animator.SetBool("IsHit", IsHit);
+        _animator.SetBool("IsDead", IsDead);
     }
 
     private void FixedUpdate()
@@ -69,6 +99,10 @@ public class PlayerMovement : MonoBehaviour
         {
             Move(MoveStats.AirAcceleration, MoveStats.AirDeceleration, InputManager.Movement);
         }
+    
+        // Attack checks !!!
+        IsLightAttacking = InputManager.AttackWasPressed;
+        IsHeavyAttacking = InputManager.HeavyAttackWasPressed;
     }
 
     private void OnDrawGizmos()
@@ -88,6 +122,12 @@ public class PlayerMovement : MonoBehaviour
 
     private void Move(float acceleration, float deceleration, Vector2 moveInput)
     {
+        // print("move ismoveable");
+        // print(isMoveable);
+        if (!isMoveable)
+        {
+            moveInput = Vector2.zero;
+        }
         if (moveInput != Vector2.zero)
         {
             TurnCheck(moveInput);
@@ -95,10 +135,12 @@ public class PlayerMovement : MonoBehaviour
             Vector2 targetVelocity = Vector2.zero;
             if (InputManager.RunIsHeld)
             {
+                IsMoving = true;
                 targetVelocity = new Vector2(moveInput.x, 0f) * MoveStats.MaxRunSpeed;
             }
             else
             {
+                IsMoving = true;
                 targetVelocity = new Vector2(moveInput.x, 0f) * MoveStats.MaxWalkSpeed;
             }
 
@@ -108,10 +150,10 @@ public class PlayerMovement : MonoBehaviour
 
         else if (moveInput == Vector2.zero)
         {
+            IsMoving = false;
             _moveVelocity = Vector2.Lerp(_moveVelocity, Vector2.zero, deceleration * Time.fixedDeltaTime);
             _rb.velocity = new Vector2(_moveVelocity.x, _rb.velocity.y);
         }
-        
     }
 
     private void TurnCheck(Vector2 moveInput)
@@ -232,6 +274,10 @@ public class PlayerMovement : MonoBehaviour
 
     private void Jump()
     {
+        // print("jump ismoveable");
+        // print(isMoveable);
+        IsJumping = _isJumping; // For animation purposes
+
         // APPLY GRAVITY WHILE JUMPING
         if (_isJumping)
         {
@@ -497,4 +543,95 @@ public class PlayerMovement : MonoBehaviour
             previousPosition = drawPoint;
         }
     }
+
+    // void OnFire()
+    // {
+    //     _animator.SetTrigger("attack");
+    // }
+
+    public void Attack()
+    {
+
+        // // Debug.Log(_isFacingRight);
+        attack.AttackAction();
+        // if (!_isFacingRight)
+        // {
+        //     attack.AttackLeft();
+        // }
+        // else
+        // {
+        //     attack.AttackRight();
+        // }
+
+        // Invoke("EndAttack", 0.1f);
+    }
+
+    public void EndAttack()
+    {
+        attack.StopAttack();
+        IsLightAttacking = false;
+    }
+
+    public void LockMove()
+    {
+        isMoveable = false;
+    }
+
+    public void HeavyAttack()
+    {
+        // print("moveable");
+        // print(isMoveable);
+
+        // // Debug.Log(_isFacingRight);
+        heavyAttack.AttackAction();
+        // if (!_isFacingRight)
+        // {
+        //     attack.AttackLeft();
+        // }
+        // else
+        // {
+        //     attack.AttackRight();
+        // }
+
+        // Invoke("EndAttack", 0.1f);
+    }
+
+    public void EndHeavyAttack()
+    {
+        // print("heavyAttackEnds isMoveable Reset");
+        heavyAttack.StopAttack();
+        IsHeavyAttacking = false;
+        // isMoveable = true;
+    }
+
+    private void ResetIsMoveable()
+    {
+        isMoveable = true;
+    }
+
+    public void OnHit(int damage, Vector2 knockback)
+    {
+        // print("damageable");
+        // print(isDamageable);
+        if (isDamageable)
+        {
+            isDamageable = false;
+            // print(parameter.health);
+            health -= damage;
+            rb.AddForce(knockback);
+            // print(parameter.health);
+            // print(damage);
+            if (health <= 0)
+            {
+                IsDead = true;
+            }
+            else
+            {
+                IsHit = true;
+            }
+
+            Invoke("resetIsDamageable", 0.5f);
+        }
+    }
+
 }
