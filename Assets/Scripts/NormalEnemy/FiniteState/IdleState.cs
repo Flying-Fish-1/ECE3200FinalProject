@@ -38,6 +38,11 @@ public class IdleState : IState
         }
     }
 
+    public void OnFixedUpdate()
+    {
+
+    }
+
     public void OnExit()
     {
         timer = 0;
@@ -80,6 +85,11 @@ public class PatrolState : IState
         {
             manager.TransitionState(normalEnemyStateType.Idle);
         }
+    }
+
+    public void OnFixedUpdate()
+    {
+
     }
 
     public void OnExit()
@@ -131,6 +141,11 @@ public class ChaseState : IState
         }
     }
 
+    public void OnFixedUpdate()
+    {
+
+    }
+
     public void OnExit()
     {
         
@@ -168,6 +183,11 @@ public class ReactState : IState
         }
     }
 
+    public void OnFixedUpdate()
+    {
+
+    }
+
     public void OnExit()
     {
         
@@ -203,6 +223,11 @@ public class AttackState : IState
         {
             manager.TransitionState(normalEnemyStateType.Chase);
         }
+    }
+
+    public void OnFixedUpdate()
+    {
+
     }
 
     public void OnExit()
@@ -245,6 +270,11 @@ public class HitState : IState
         }
     }
 
+    public void OnFixedUpdate()
+    {
+
+    }
+
     public void OnExit()
     {
         // parameter.animator.Play("Walk");
@@ -271,6 +301,11 @@ public class DeadState : IState
     public void OnUpdate()
     {
         
+    }
+
+    public void OnFixedUpdate()
+    {
+
     }
 
     public void OnExit()

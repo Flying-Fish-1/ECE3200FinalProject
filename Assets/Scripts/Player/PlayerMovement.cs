@@ -11,12 +11,12 @@ public class PlayerMovement : MonoBehaviour, IDamageable
     [SerializeField] private Collider2D _feetColl;
     [SerializeField] private Collider2D _bodyColl;
 
-    private Rigidbody2D _rb;
+    public Rigidbody2D _rb;
     private Animator _animator;
     public Attack attack;
     public HeavyAttack heavyAttack;
     public SpriteRenderer spriteRenderer;
-    public Rigidbody2D rb;
+    //public Rigidbody2D rb;
     public int health = 100;
     private bool isDamageable = true;
 
@@ -89,7 +89,7 @@ public class PlayerMovement : MonoBehaviour, IDamageable
     private void FixedUpdate()
     {
         CollisionChecks();
-        Jump(); // Used in FixedUpdate since physical part need to be implemented in FixedUpdate
+        Jump();
 
         if (_isGrounded)
         {
@@ -618,7 +618,7 @@ public class PlayerMovement : MonoBehaviour, IDamageable
             isDamageable = false;
             // print(parameter.health);
             health -= damage;
-            rb.AddForce(knockback);
+            _rb.AddForce(knockback);
             // print(parameter.health);
             // print(damage);
             if (health <= 0)
