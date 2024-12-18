@@ -24,15 +24,20 @@ public class PlayerParameter//PlayerController : MonoBehaviour//, IDamageable
         public PlayerMovementStats MoveStats;
         public Collider2D _feetColl;
         public Collider2D _bodyColl;
+        public Collider2D _LightAttackColl;
+        public Collider2D _HeavyAttackColl;
 
         public Rigidbody2D _rb;
         public Animator _animator;
-        public Attack attack;
-        public HeavyAttack heavyAttack;
+        //public Attack attack;
+        //public HeavyAttack heavyAttack;
         public SpriteRenderer spriteRenderer;
         //public Rigidbody2D rb;
         public int health = 100;
-        public bool isDamageable = true;
+        public int currentDamage = 0;
+        public int lightDamage = 10;
+        public int heavyDamage = 20;
+        //public bool isDamageable = true;
 
         // Animation variables
         //public bool IsMoving;
@@ -101,14 +106,17 @@ public class PlayerController : MonoBehaviour
         states.Add(PlayerState.LightAttack, new PlayerLightAttackState(this));
         states.Add(PlayerState.HeavyAttack, new PlayerHeavyAttackState(this));
         //states.Add(PlayerState.SpecialAttack, new PlayerSpecialAttackState(this));
-        //states.Add(PlayerState.Hit, new PlayerHitState(this));
-        //states.Add(PlayerState.Dead, new PlayerDeadState(this));
+        states.Add(PlayerState.Hit, new PlayerHitState(this));
+        states.Add(PlayerState.Dead, new PlayerDeadState(this));
 
         //parameter.spriteRenderer = GetComponent<SpriteRenderer>();
         //parameter._rb = GetComponent<Rigidbody2D>();
         //parameter.attack = GetComponent<Attack>();
         //parameter.heavyAttack = GetComponent<HeavyAttack>();
         parameter.health = 100;
+
+        parameter._LightAttackColl.enabled = false;
+        parameter._HeavyAttackColl.enabled = false;
         
         TransitionState(PlayerState.Idle);
     }
@@ -147,6 +155,39 @@ public class PlayerController : MonoBehaviour
 
         currentState = states[nextState];
         currentState.OnEnter();
+    }
+
+    private void OnEnable()
+    {
+        CombatSystem.OnEnemyAttackHit += OnEnemyAttackHit;
+        //Debug.Log("PlayerController is Enabled");
+    }
+
+    private void OnDisable()
+    {
+        CombatSystem.OnEnemyAttackHit -= OnEnemyAttackHit;
+    }
+
+    private void OnEnemyAttackHit(GameObject attacker, GameObject target, int damage)
+    {
+        //Debug.Log("Player is Hit by" + target.name);
+        if (target.CompareTag("Player"))
+        {
+            //Debug.Log("Player is Hit triggered");
+            // 处理玩家受击逻辑
+            parameter.health -= damage;
+            Debug.Log("Player's Health: " + parameter.health);
+
+            // 判断玩家是否死亡
+            if (parameter.health <= 0)
+            {
+                TransitionState(PlayerState.Dead);
+            }
+            else
+            {
+                TransitionState(PlayerState.Hit);
+            }
+        }
     }
 
     #region Movement
@@ -572,4 +613,6 @@ public class PlayerController : MonoBehaviour
             previousPosition = drawPoint;
         }
     }
+ 
+        
 }

@@ -72,11 +72,12 @@ public class PatrolState : IState
         manager.FlipTo(parameter.patrolPoints[patrolPosition]);
 
         manager.transform.position = Vector2.MoveTowards(manager.transform.position, parameter.patrolPoints[patrolPosition].position, parameter.moveSpeed * Time.deltaTime);
-
+        /*
         if (parameter.getHit)
         {
             manager.TransitionState(normalEnemyStateType.Hit);
         }
+        */
         if (parameter.target != null && parameter.target.position.x >= parameter.chasePoints[0].position.x && parameter.target.position.x <= parameter.chasePoints[1].position.x)
         {
             manager.TransitionState(normalEnemyStateType.React);
@@ -122,12 +123,13 @@ public class ChaseState : IState
     public void OnUpdate()
     {
         manager.FlipTo(parameter.target);
-
+        /*
         if (parameter.getHit)
         {
             manager.TransitionState(normalEnemyStateType.Hit);
         }
-        if (parameter.target != null)
+        */
+        if (parameter.target != null && !Physics2D.OverlapCircle(parameter.attackPoint.position, parameter.attackArea, parameter.targetLayer))
         {
             manager.transform.position = Vector2.MoveTowards(manager.transform.position, parameter.target.position, parameter.chaseSpeed * Time.deltaTime);
         }
@@ -198,7 +200,9 @@ public class AttackState : IState
 {
     private normalEnemyFSM manager;
     private Parameter parameter;
+    private bool hasAttacked;
     private AnimatorStateInfo info;
+    private float progress;
 
     public AttackState(normalEnemyFSM manager)
     {
@@ -209,16 +213,20 @@ public class AttackState : IState
     public void OnEnter()
     {
         parameter.animator.Play("Attack");
+        hasAttacked = false;
+        parameter.damage = 10;
     }
 
     public void OnUpdate()
     {
         info = parameter.animator.GetCurrentAnimatorStateInfo(0);
-
+        progress = info.normalizedTime % 1f;
+        /*
         if (parameter.getHit)
         {
             manager.TransitionState(normalEnemyStateType.Hit);
         }
+        */
         if (info.normalizedTime >= 0.95f)
         {
             manager.TransitionState(normalEnemyStateType.Chase);
@@ -228,6 +236,30 @@ public class AttackState : IState
     public void OnFixedUpdate()
     {
 
+        if (progress >= 0.3f && progress <= 0.6f && !hasAttacked)
+        {
+            hasAttacked = true;
+
+            // 检测攻击范围内的玩家
+            Collider2D[] hitPlayers = Physics2D.OverlapCircleAll(
+                parameter.attackPoint.position,
+                parameter.attackArea,
+                LayerMask.GetMask("Player")
+            );
+
+            foreach (Collider2D playerCollider in hitPlayers)
+            {
+                //Debug.Log("Enemy Attack Player");
+                GameObject player = playerCollider.gameObject;
+                // 触发敌人攻击事件
+                CombatSystem.TriggerEnemyAttack(manager.gameObject, player, parameter.damage);
+            }
+        }
+
+        if (progress >= 0.95f)
+        {
+            manager.TransitionState(normalEnemyStateType.Chase);
+        }
     }
 
     public void OnExit()
@@ -241,6 +273,7 @@ public class HitState : IState
     private normalEnemyFSM manager;
     private Parameter parameter;
     private AnimatorStateInfo info;
+    private float progress;
 
     public HitState(normalEnemyFSM manager)
     {
@@ -250,6 +283,8 @@ public class HitState : IState
     
     public void OnEnter()
     {
+        Debug.Log("Enemy is Hit");
+        Debug.Log("Enemy's Health: " + parameter.health);
         parameter.animator.Play("Hit");
         // parameter.health -= 10;
     }
@@ -257,12 +292,13 @@ public class HitState : IState
     public void OnUpdate()
     {
         info = parameter.animator.GetCurrentAnimatorStateInfo(0);
+        progress = info.normalizedTime % 1f;
 
         if (parameter.health <= 0)
         {
             manager.TransitionState(normalEnemyStateType.Dead);
         }
-        else
+        else if (info.normalizedTime >= 0.95f)
         {
             parameter.target = GameObject.FindWithTag("Player").transform;
 
