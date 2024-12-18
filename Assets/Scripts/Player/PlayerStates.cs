@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEditor;
 using UnityEngine;
+using DG.Tweening;
 
 public class PlayerIdleState : IState
 {
@@ -17,7 +18,7 @@ public class PlayerIdleState : IState
 
     public void OnEnter()
     {
-        parameter._animator.Play("Idle");
+        parameter._animator.Play("idle");
     }
 
     public void OnUpdate()
@@ -257,7 +258,7 @@ public class PlayerLightAttackState : IState
         info = parameter._animator.GetCurrentAnimatorStateInfo(0);
         progress = info.normalizedTime;
 
-        if (progress >= 0.95f)
+        if (progress >= 1f)
         {
             manager.TransitionState(PlayerState.Idle);
         }
@@ -266,9 +267,37 @@ public class PlayerLightAttackState : IState
     public void OnFixedUpdate()
     {
         // 攻击判定窗口
-        if (progress >= 0.3f && progress <= 0.6f)
+        if (progress >= 0.3f && progress <= 0.5f)
         {
             // 只在第一次进入攻击窗口时启用攻击碰撞器
+            if (!hasAttacked)
+            {
+                hasAttacked = true;
+                parameter._LightAttackColl.enabled = true;
+            }
+
+            // 检测攻击范围内的敌人
+            Collider2D[] hitEnemies = Physics2D.OverlapBoxAll(
+                parameter._LightAttackColl.bounds.center,
+                parameter._LightAttackColl.bounds.size,
+                0f,
+                LayerMask.GetMask("Enemy")
+            );
+
+            foreach (Collider2D enemyCollider in hitEnemies)
+            {
+                GameObject enemy = enemyCollider.gameObject;
+                if (!enemiesHit.Contains(enemy))
+                {
+                    enemiesHit.Add(enemy);
+                    // 触发攻击事件
+                    CombatSystem.TriggerPlayerAttack(manager.gameObject, enemy, parameter.lightDamage);
+                }
+            }
+        }
+
+        else if(progress >= 0.8f && progress < 0.95f)
+        {
             if (!hasAttacked)
             {
                 hasAttacked = true;
@@ -299,8 +328,11 @@ public class PlayerLightAttackState : IState
             // 超出攻击窗口，禁用攻击碰撞器
             if (parameter._LightAttackColl.enabled)
             {
+                
                 parameter._LightAttackColl.enabled = false;
             }
+            hasAttacked = false;
+            enemiesHit.Clear();
         }
 
         // 动画结束，切换回待机状态
@@ -313,6 +345,7 @@ public class PlayerLightAttackState : IState
 
     public void OnExit()
     {
+        parameter._LightAttackColl.enabled = false;
         parameter.currentDamage = 0;
         enemiesHit.Clear();
     }
@@ -338,6 +371,8 @@ public class PlayerHeavyAttackState : IState
 
     public void OnEnter()
     {
+        parameter.isMoveable = false;
+
         parameter.currentDamage = parameter.heavyDamage;
         parameter._animator.Play("LightAttack02");
         enemiesHit.Clear(); // 进入状态时清空已击中敌人列表
@@ -358,7 +393,7 @@ public class PlayerHeavyAttackState : IState
     public void OnFixedUpdate()
     {
         // 攻击判定窗口
-        if (progress >= 0.3f && progress <= 0.6f)
+        if (progress >= 0.5f && progress <= 0.9f)
         {
             // 只在第一次进入攻击窗口时启用攻击碰撞器
             if (!hasAttacked)
@@ -404,6 +439,8 @@ public class PlayerHeavyAttackState : IState
 
     public void OnExit()
     {
+        parameter._HeavyAttackColl.enabled = false;
+        parameter.isMoveable = true;
         parameter.currentDamage = 0;
         enemiesHit.Clear();
     }
@@ -447,6 +484,7 @@ public class PlayerHitState : IState
     private PlayerParameter parameter;
     AnimatorStateInfo info;
     float progress;
+    private Sequence hitSequence;
 
     public PlayerHitState(PlayerController manager)
     {
@@ -456,7 +494,23 @@ public class PlayerHitState : IState
 
     public void OnEnter()
     {
-        Debug.Log("Player is hit");
+        parameter.isMoveable = false;
+        parameter._animator.Play("hurt");
+
+        // 创建动画序列
+        hitSequence = DOTween.Sequence();
+        
+        // 添加顿帧效果
+        hitSequence.AppendCallback(() => Time.timeScale = 0.1f)
+                  .AppendInterval(0.025f)
+                  .AppendCallback(() => Time.timeScale = 1f);
+                  
+        // 添加震屏效果
+        //Camera.main.DOShakePosition(0.2f, 0.5f, 10, 90, false);
+        
+        // 添加受击闪烁
+        parameter.spriteRenderer.DOColor(Color.red, 0.1f)
+                               .SetLoops(2, LoopType.Yoyo);
     }
 
     public void OnUpdate()
@@ -466,7 +520,9 @@ public class PlayerHitState : IState
 
         if (progress >= 0.95f)
         {
+            parameter.isMoveable = true;
             manager.TransitionState(PlayerState.Idle);
+            
         }
     }
 
@@ -477,7 +533,9 @@ public class PlayerHitState : IState
 
     public void OnExit()
     {
-        
+        parameter.isMoveable = true;
+        hitSequence?.Kill();
+        parameter.spriteRenderer.color = Color.white;
     }
 }
 

@@ -23,12 +23,14 @@ public class Parameter
     public float chaseSpeed;
     public float idleTime;
     public float attackArea;
+    public Collider2D attackHitBox;
     public Transform[] patrolPoints;
     public Transform[] chasePoints;
     public Transform target;
     public Transform attackPoint;
     public LayerMask targetLayer;
     public Animator animator;
+    public SpriteRenderer spriteRenderer;
     public Rigidbody2D rb;
     public bool getHit;
 }
@@ -55,6 +57,7 @@ public class normalEnemyFSM : MonoBehaviour//, IDamageable
         TransitionState(normalEnemyStateType.Idle);
 
         parameter.animator = GetComponent<Animator>();
+        parameter.spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     void Update()

@@ -36,7 +36,7 @@ public class PlayerParameter//PlayerController : MonoBehaviour//, IDamageable
         public int health = 100;
         public int currentDamage = 0;
         public int lightDamage = 10;
-        public int heavyDamage = 20;
+        public int heavyDamage = 30;
         //public bool isDamageable = true;
 
         // Animation variables
@@ -109,7 +109,7 @@ public class PlayerController : MonoBehaviour
         states.Add(PlayerState.Hit, new PlayerHitState(this));
         states.Add(PlayerState.Dead, new PlayerDeadState(this));
 
-        //parameter.spriteRenderer = GetComponent<SpriteRenderer>();
+        parameter.spriteRenderer = GetComponent<SpriteRenderer>();
         //parameter._rb = GetComponent<Rigidbody2D>();
         //parameter.attack = GetComponent<Attack>();
         //parameter.heavyAttack = GetComponent<HeavyAttack>();
@@ -196,12 +196,12 @@ public class PlayerController : MonoBehaviour
     {
         // print("move ismoveable");
         // print(isMoveable);
-        /*
+        
         if (!parameter.isMoveable)
         {
             moveInput = Vector2.zero;
         }
-        */
+        
         if (moveInput != Vector2.zero)
         {
             TurnCheck(moveInput);
