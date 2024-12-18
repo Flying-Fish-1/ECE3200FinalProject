@@ -197,10 +197,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   parameter:
     health: 100
+    damage: 10
     moveSpeed: 2
     chaseSpeed: 3
     idleTime: 1
     attackArea: 0.03
+    attackHitBox: {fileID: 4184660372024043304}
     patrolPoints:
     - {fileID: 0}
     - {fileID: 0}
@@ -213,6 +215,7 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 128
     animator: {fileID: 6190300821983508626}
+    spriteRenderer: {fileID: 0}
     rb: {fileID: 4228534131163083639}
     getHit: 0
 --- !u!1 &8707057312990614712
@@ -225,10 +228,9 @@ GameObject:
   m_Component:
   - component: {fileID: 8659009081473059741}
   - component: {fileID: 4184660372024043304}
-  - component: {fileID: 132255013975180317}
   m_Layer: 6
   m_Name: attackArea
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -293,21 +295,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &132255013975180317
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8707057312990614712}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 640a99f9a687bce4b93152a49a833395, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enemyAttackCollider: {fileID: 0}
-  damage: 10
-  knockbackForce: 500
 --- !u!1 &9195554983106044386
 GameObject:
   m_ObjectHideFlags: 0
@@ -318,6 +305,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6643909391012567879}
   - component: {fileID: 6058224394312869895}
+  - component: {fileID: 7576149159717091789}
   m_Layer: 0
   m_Name: ViewArea
   m_TagString: Untagged
@@ -372,7 +360,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 1.0879354, y: 0.4938544}
+  m_Offset: {x: 2.1852288, y: 0.4938544}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -383,5 +371,18 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.9518738, y: 1.082309}
+  m_Size: {x: 4.1464605, y: 1.082309}
   m_EdgeRadius: 0
+--- !u!114 &7576149159717091789
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9195554983106044386}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f9d69e9475a3bd4c853f034a91158ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 6190300821983508626}
