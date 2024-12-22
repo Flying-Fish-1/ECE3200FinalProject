@@ -251,7 +251,7 @@ public class AttackState : IState
 
             foreach (Collider2D playerCollider in hitPlayers)
             {
-                //Debug.Log("Enemy Attack Player");
+                Debug.Log("Enemy Attack Player");
                 GameObject player = playerCollider.gameObject;
                 // 触发敌人攻击事件
                 CombatSystem.TriggerEnemyAttack(manager.gameObject, player, parameter.damage);
@@ -339,6 +339,7 @@ public class HitState : IState
 
     public void OnExit()
     {
+        Time.timeScale = 1f;
         hitSequence?.Kill();
         parameter.spriteRenderer.color = Color.white;
         parameter.getHit = false;

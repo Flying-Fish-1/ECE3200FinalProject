@@ -45,8 +45,9 @@ public class PlayerIdleState : IState
         {
             manager.TransitionState(PlayerState.HeavyAttack);
         }
-        if (InputManager.SpecialAttackWasPressed && parameter.energy >= parameter.maxEnergy/2)
+        if (InputManager.SpecialAttackWasPressed && parameter.energy >= parameter.maxEnergy)
         {
+            parameter._isDamageable = false;
             manager.TransitionState(PlayerState.SpecialAttack);
         }
         
@@ -102,8 +103,9 @@ public class PlayerWalkState : IState
         {
             manager.TransitionState(PlayerState.HeavyAttack);
         }
-        if (InputManager.SpecialAttackWasPressed && parameter.energy >= parameter.maxEnergy/2)
+        if (InputManager.SpecialAttackWasPressed && parameter.energy >= parameter.maxEnergy)
         {
+            parameter._isDamageable = false;
             manager.TransitionState(PlayerState.SpecialAttack);
         }
 
@@ -159,8 +161,9 @@ public class PlayerRunState : IState
         {
             manager.TransitionState(PlayerState.HeavyAttack);
         }
-        if (InputManager.SpecialAttackWasPressed && parameter.energy >= parameter.maxEnergy/2)
+        if (InputManager.SpecialAttackWasPressed && parameter.energy >= parameter.maxEnergy)
         {
+            parameter._isDamageable = false;
             manager.TransitionState(PlayerState.SpecialAttack);
         }
     }
@@ -431,6 +434,7 @@ public class PlayerHeavyAttackState : IState
                     enemiesHit.Add(enemy);
                     // 触发攻击事件
                     CombatSystem.TriggerPlayerAttack(manager.gameObject, enemy, parameter.heavyDamage * ((parameter.energy * 3)/parameter.maxEnergy + 1));
+                    parameter.energy += 15;
                 }
             }
         }
@@ -480,7 +484,7 @@ public class PlayerSpecialAttackState : IState
     {
         parameter.isMoveable = false;
         parameter._isDamageable = false;
-        parameter.energy -= parameter.maxEnergy/2;
+        parameter.energy -= parameter.maxEnergy;
 
         parameter.currentDamage = parameter.specialDamage;
         parameter._animator.Play("ThrowSword");
@@ -640,6 +644,7 @@ public class PlayerHitState : IState
 
     public void OnExit()
     {
+        Time.timeScale = 1f;
         parameter.isMoveable = true;
         hitSequence?.Kill();
         parameter.spriteRenderer.color = Color.white;

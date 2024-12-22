@@ -130,6 +130,7 @@ public class normalEnemyFSM : MonoBehaviour//, IDamageable
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        // Debug.Log(other.CompareTag("Player"));
         if (other.CompareTag("Player"))
         {
             parameter.target = other.transform;

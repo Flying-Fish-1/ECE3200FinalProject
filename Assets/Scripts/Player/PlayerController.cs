@@ -39,7 +39,7 @@ public class PlayerParameter//PlayerController : MonoBehaviour//, IDamageable
         public int currentDamage = 0;
         public int lightDamage = 5;
         public int heavyDamage = 10;
-        public int specialDamage = 60;
+        public int specialDamage = 100;
         public int energy = 0;
         public int maxEnergy = 100;
         //public bool isDamageable = true;
@@ -196,7 +196,8 @@ public class PlayerController : MonoBehaviour
 
     private void OnEnemyAttackHit(GameObject attacker, GameObject target, int damage)
     {
-        //Debug.Log("Player is Hit by" + target.name);
+        Debug.Log("Player is Hit by" + target.name);
+        Debug.Log(parameter._isDamageable);
         if (target.CompareTag("Player") && parameter._isDamageable)
         {
             //Debug.Log("Player is Hit triggered");
