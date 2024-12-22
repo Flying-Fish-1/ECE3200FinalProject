@@ -246,6 +246,8 @@ public class PlayerLightAttackState : IState
     private bool hasAttacked;
     AnimatorStateInfo info;
     float progress;
+    private bool hasPlayedAudio1;
+    private bool hasPlayedAudio2;
 
     // 用于记录已被击中的敌人
     private HashSet<GameObject> enemiesHit;
@@ -260,10 +262,12 @@ public class PlayerLightAttackState : IState
 
     public void OnEnter()
     {
-        parameter.currentDamage = parameter.lightDamage; 
+        parameter.currentDamage = parameter.lightDamage;
         parameter._animator.Play("LightAttack");
         //Debug.Log("Light Attack");
         hasAttacked = false;
+        hasPlayedAudio1 = false;
+        hasPlayedAudio2 = false;
         enemiesHit.Clear(); // 进入状态时清空已击中敌人列表
     }
 
@@ -281,6 +285,12 @@ public class PlayerLightAttackState : IState
     public void OnFixedUpdate()
     {
         // 攻击判定窗口
+        if (progress >= 0.2f && !hasPlayedAudio1)
+        {
+            parameter.music.clip = parameter.light;
+            parameter.music.Play();
+            hasPlayedAudio1 = true;
+        }
         if (progress >= 0.3f && progress <= 0.5f)
         {
             // 只在第一次进入攻击窗口时启用攻击碰撞器
@@ -310,9 +320,17 @@ public class PlayerLightAttackState : IState
                 }
             }
         }
+        else if (progress >= 0.5f && !hasPlayedAudio2)
+        {
+            parameter.music.clip = parameter.light;
+            parameter.music.Play();
+            hasPlayedAudio2 = true;
+        }
 
         else if(progress >= 0.8f && progress < 0.95f)
         {
+            parameter.music.clip = parameter.light;
+            parameter.music.Play();
             if (!hasAttacked)
             {
                 hasAttacked = true;
@@ -335,10 +353,15 @@ public class PlayerLightAttackState : IState
                     enemiesHit.Add(enemy);
                     // 触发攻击事件
                     CombatSystem.TriggerPlayerAttack(manager.gameObject, enemy, parameter.lightDamage);
-                    if (parameter.energy < parameter.maxEnergy) parameter.energy += 5;
+                    parameter.energy += 5;
+                    if (parameter.energy > parameter.maxEnergy)
+                    {
+                        parameter.energy = parameter.maxEnergy;
+                    }
                 }
             }
         }
+
         else
         {
             // 超出攻击窗口，禁用攻击碰撞器
@@ -347,6 +370,8 @@ public class PlayerLightAttackState : IState
                 
                 parameter._LightAttackColl.enabled = false;
             }
+            hasPlayedAudio1 = false;
+            hasPlayedAudio2 = false;
             hasAttacked = false;
             enemiesHit.Clear();
         }
@@ -374,6 +399,7 @@ public class PlayerHeavyAttackState : IState
     private bool hasAttacked;
     AnimatorStateInfo info;
     float progress;
+    private bool hasPlayedAudio;
 
     // 用于记录已被击中的敌人
     private HashSet<GameObject> enemiesHit;
@@ -388,7 +414,7 @@ public class PlayerHeavyAttackState : IState
     public void OnEnter()
     {
         parameter.isMoveable = false;
-
+        hasPlayedAudio = false;
         parameter.currentDamage = parameter.heavyDamage;
         parameter._animator.Play("LightAttack02");
         enemiesHit.Clear(); // 进入状态时清空已击中敌人列表
@@ -407,7 +433,14 @@ public class PlayerHeavyAttackState : IState
     }
 
     public void OnFixedUpdate()
-    {
+    {   
+
+        if (progress >= 0.4f && !hasPlayedAudio)
+        {
+            hasPlayedAudio = true;
+            parameter.music.clip = parameter.heavy;
+            parameter.music.Play();
+        }
         // 攻击判定窗口
         if (progress >= 0.5f && progress <= 0.9f)
         {
@@ -435,6 +468,10 @@ public class PlayerHeavyAttackState : IState
                     // 触发攻击事件
                     CombatSystem.TriggerPlayerAttack(manager.gameObject, enemy, parameter.heavyDamage * ((parameter.energy * 3)/parameter.maxEnergy + 1));
                     parameter.energy += 15;
+                    if (parameter.energy > parameter.maxEnergy)
+                    {
+                        parameter.energy = parameter.maxEnergy;
+                    }
                 }
             }
         }
@@ -471,6 +508,8 @@ public class PlayerSpecialAttackState : IState
     float progress;
     private bool hasAttacked;
     private HashSet<GameObject> enemiesHit;
+    private bool hasPlayedSpecial;
+    private bool hasPlayedCounter;
     
 
     public PlayerSpecialAttackState(PlayerController manager)
@@ -484,6 +523,8 @@ public class PlayerSpecialAttackState : IState
     {
         parameter.isMoveable = false;
         parameter._isDamageable = false;
+        hasPlayedSpecial = false;
+        // hasPlayedCounter = false;
         parameter.energy -= parameter.maxEnergy;
 
         parameter.currentDamage = parameter.specialDamage;
@@ -505,6 +546,12 @@ public class PlayerSpecialAttackState : IState
 
     public void OnFixedUpdate()
     {
+        if (progress >= 0.25f && !hasPlayedSpecial)
+        {
+            parameter.music.clip = parameter.special;
+            parameter.music.Play();
+            hasPlayedSpecial = true;
+        }
         // 攻击判定窗口
         if (progress >= 0.3f && progress <= 0.9f)
         {
@@ -543,6 +590,10 @@ public class PlayerSpecialAttackState : IState
                     enemiesHit.Add(enemy);
                     // 触发攻击事件
                     CombatSystem.TriggerPlayerAttack(manager.gameObject, enemy, parameter.specialDamage * 2);
+                    // if (!hasPlayedCounter)
+                    parameter.music.clip = parameter.counter;
+                    parameter.music.Play();
+                    // hasPlayedCounter = true;
                 }
                 // enemiesHit.Add(enemy);
                 // CombatSystem.TriggerPlayerAttack(manager.gameObject, enemy, parameter.specialDamage);

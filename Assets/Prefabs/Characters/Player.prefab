@@ -466,7 +466,7 @@ MonoBehaviour:
     lightDamage: 5
     heavyDamage: 10
     specialDamage: 50
-    energy: 0
+    energy: 100
     maxEnergy: 100
     isMoveable: 1
     _moveVelocity: {x: 0, y: 0}
@@ -489,7 +489,6 @@ MonoBehaviour:
     _coyoteTimer: 0
     ui_healthbar: {fileID: 0}
     ui_energybar: {fileID: 0}
-    deadMenu: {fileID: 0}
 --- !u!114 &6913654971854859754
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -516,7 +515,7 @@ MonoBehaviour:
   - {x: 0.18843764, y: 0.49553117, z: 0}
   m_ShapePathHash: 1342566618
   m_Mesh: {fileID: 0}
-  m_InstanceId: -2884
+  m_InstanceId: -1470
   m_LocalBounds:
     m_Center: {x: 0.021703064, y: 0.8564532, z: 0}
     m_Extent: {x: 0.19120327, y: 0.36092198, z: 0}

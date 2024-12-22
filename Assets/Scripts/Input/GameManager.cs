@@ -15,6 +15,12 @@ public class GameManager : MonoBehaviour
 
     public GameObject ingameMenu;
     public GameObject deadMenu;
+    public AudioSource music;
+
+    private void Start()
+    {
+        music.Play();
+    }
 
     private void Update()
     {

@@ -33,6 +33,11 @@ public class PlayerParameter//PlayerController : MonoBehaviour//, IDamageable
         //public Attack attack;
         //public HeavyAttack heavyAttack;
         public SpriteRenderer spriteRenderer;
+        public AudioSource music;
+        public AudioClip light;
+        public AudioClip heavy;
+        public AudioClip counter;
+        public AudioClip special;
         //public Rigidbody2D rb;
         public int maxHealth = 100;
         public int health = 100;

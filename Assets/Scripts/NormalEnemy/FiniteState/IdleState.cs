@@ -202,8 +202,12 @@ public class AttackState : IState
     private normalEnemyFSM manager;
     private Parameter parameter;
     private bool hasAttacked;
+    private bool hasPlayedAudio;
     private AnimatorStateInfo info;
     private float progress;
+
+    // audioSource = this.GetComponent<AudioSource>();
+    // music.playOnAwake = false;
 
     public AttackState(normalEnemyFSM manager)
     {
@@ -215,6 +219,7 @@ public class AttackState : IState
     {
         parameter.animator.Play("Attack");
         hasAttacked = false;
+        hasPlayedAudio = false;
         parameter.damage = 10;
     }
 
@@ -236,6 +241,11 @@ public class AttackState : IState
 
     public void OnFixedUpdate()
     {
+        if (progress >= 0.2f && !hasPlayedAudio) 
+        {
+            parameter.music.Play();
+            hasPlayedAudio = true;
+        }
 
         if (progress >= 0.5f && progress <= 0.9f && !hasAttacked)
         {

@@ -34,6 +34,8 @@ public class Parameter
     public Rigidbody2D rb;
     public bool getHit;
     public GameObject EnemyObject;
+    public AudioSource music;
+    // public AudioClip axeSlash;
 }
 
 public class normalEnemyFSM : MonoBehaviour//, IDamageable
