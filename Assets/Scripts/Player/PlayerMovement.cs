@@ -11,12 +11,13 @@ public class PlayerMovement : MonoBehaviour, IDamageable
     [SerializeField] private Collider2D _feetColl;
     [SerializeField] private Collider2D _bodyColl;
 
-    private Rigidbody2D _rb;
+    public Rigidbody2D _rb;
     private Animator _animator;
     public Attack attack;
     public HeavyAttack heavyAttack;
+    // public SpecialAttack specialAttack;
     public SpriteRenderer spriteRenderer;
-    public Rigidbody2D rb;
+    //public Rigidbody2D rb;
     public int health = 100;
     private bool isDamageable = true;
 
@@ -25,6 +26,7 @@ public class PlayerMovement : MonoBehaviour, IDamageable
     private bool IsJumping;
     private bool IsLightAttacking;
     private bool IsHeavyAttacking;
+    private bool IsSpecialAttacking;
     private bool IsHit;
     private bool IsDead;
     private static bool isMoveable = true;
@@ -76,12 +78,14 @@ public class PlayerMovement : MonoBehaviour, IDamageable
         UpdateAnimations();
     }
 
+
     private void UpdateAnimations()
     {
         _animator.SetBool("IsJumping", IsJumping);
         _animator.SetBool("IsRunning", IsMoving);
         _animator.SetBool("IsLightAttacking", IsLightAttacking);
         _animator.SetBool("IsHeavyAttacking", IsHeavyAttacking);
+        _animator.SetBool("IsSpecialAttacking", IsSpecialAttacking);
         _animator.SetBool("IsHit", IsHit);
         _animator.SetBool("IsDead", IsDead);
     }
@@ -89,7 +93,7 @@ public class PlayerMovement : MonoBehaviour, IDamageable
     private void FixedUpdate()
     {
         CollisionChecks();
-        Jump(); // Used in FixedUpdate since physical part need to be implemented in FixedUpdate
+        Jump();
 
         if (_isGrounded)
         {
@@ -103,6 +107,7 @@ public class PlayerMovement : MonoBehaviour, IDamageable
         // Attack checks !!!
         IsLightAttacking = InputManager.AttackWasPressed;
         IsHeavyAttacking = InputManager.HeavyAttackWasPressed;
+        // IsSpecialAttacking = InputManager.SpecialAttackWasPressed;
     }
 
     private void OnDrawGizmos()
@@ -604,6 +609,33 @@ public class PlayerMovement : MonoBehaviour, IDamageable
         // isMoveable = true;
     }
 
+    // public void SpecialAttack()
+    // {
+    //     // print("moveable");
+    //     // print(isMoveable);
+
+    //     // // Debug.Log(_isFacingRight);
+    //     specialAttack.AttackAction();
+    //     // if (!_isFacingRight)
+    //     // {
+    //     //     attack.AttackLeft();
+    //     // }
+    //     // else
+    //     // {
+    //     //     attack.AttackRight();
+    //     // }
+
+    //     // Invoke("EndAttack", 0.1f);
+    // }
+
+    // public void EndSpecialAttack()
+    // {
+    //     // print("heavyAttackEnds isMoveable Reset");
+    //     specialAttack.StopAttack();
+    //     IsSpecialAttacking = false;
+    //     // isMoveable = true;
+    // }
+
     private void ResetIsMoveable()
     {
         isMoveable = true;
@@ -618,7 +650,7 @@ public class PlayerMovement : MonoBehaviour, IDamageable
             isDamageable = false;
             // print(parameter.health);
             health -= damage;
-            rb.AddForce(knockback);
+            _rb.AddForce(knockback);
             // print(parameter.health);
             // print(damage);
             if (health <= 0)

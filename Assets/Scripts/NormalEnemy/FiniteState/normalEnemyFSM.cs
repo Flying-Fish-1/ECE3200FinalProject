@@ -18,27 +18,31 @@ public enum normalEnemyStateType
 public class Parameter
 {
     public int health;
+    public int damage = 10;
     public float moveSpeed;
     public float chaseSpeed;
     public float idleTime;
     public float attackArea;
+    public Collider2D attackHitBox;
     public Transform[] patrolPoints;
     public Transform[] chasePoints;
     public Transform target;
     public Transform attackPoint;
     public LayerMask targetLayer;
     public Animator animator;
+    public SpriteRenderer spriteRenderer;
     public Rigidbody2D rb;
     public bool getHit;
+    public GameObject EnemyObject;
 }
 
-public class normalEnemyFSM : MonoBehaviour, IDamageable
+public class normalEnemyFSM : MonoBehaviour//, IDamageable
 {
     public Parameter parameter;
 
     private IState currentState;
     private Dictionary<normalEnemyStateType, IState> states = new Dictionary<normalEnemyStateType, IState>();
-    private bool isDamageable = true;
+    //private bool isDamageable = true;
 
     
     void Start()
@@ -54,16 +58,18 @@ public class normalEnemyFSM : MonoBehaviour, IDamageable
         TransitionState(normalEnemyStateType.Idle);
 
         parameter.animator = GetComponent<Animator>();
+        parameter.spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     void Update()
     {
         currentState.OnUpdate();
 
-        if (false)
-        {
-           parameter.getHit = true;
-        }
+    }
+
+    void FixedUpdate()
+    {
+        currentState.OnFixedUpdate();
     }
 
     public void TransitionState(normalEnemyStateType type)
@@ -75,6 +81,36 @@ public class normalEnemyFSM : MonoBehaviour, IDamageable
         
         currentState = states[type];
         currentState.OnEnter();
+    }
+
+    private void OnEnable()
+    {
+        CombatSystem.OnPlayerAttackHit += OnPlayerAttackHit;
+    }
+
+    private void OnDisable()
+    {
+        CombatSystem.OnPlayerAttackHit -= OnPlayerAttackHit;
+    }
+
+    private void OnPlayerAttackHit(GameObject attacker, GameObject target, int damage)
+    {
+        if (target == gameObject)
+        {
+            // 处理敌人受击逻辑
+            parameter.health -= damage;
+            parameter.getHit = true;
+
+            // 判断敌人是否死亡
+            if (parameter.health <= 0)
+            {
+                TransitionState(normalEnemyStateType.Dead);
+            }
+            else
+            {
+                TransitionState(normalEnemyStateType.Hit);
+            }
+        }
     }
 
     public void FlipTo(Transform target)
@@ -97,6 +133,7 @@ public class normalEnemyFSM : MonoBehaviour, IDamageable
         if (other.CompareTag("Player"))
         {
             parameter.target = other.transform;
+            //Debug.Log("Player is viewed");
         }
     }
 
@@ -113,6 +150,8 @@ public class normalEnemyFSM : MonoBehaviour, IDamageable
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(parameter.attackPoint.position, parameter.attackArea);
     }
+
+    /*
     public void OnHit(int damage, Vector2 knockback)
     {
         print("damageable");
@@ -159,4 +198,6 @@ public class normalEnemyFSM : MonoBehaviour, IDamageable
     {
         isDamageable = true;
     }
+    */
 }
+
